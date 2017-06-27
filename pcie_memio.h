@@ -18,38 +18,38 @@ using namespace std;
 
 #define FAUT_CONDITION do { fprintf(stderr, "Error at line %d, file %s (%d) [%s]\n", __LINE__, __FILE__, errno, strerror(errno)); exit(1); } while(0)
 
-#define PAGE_SIZE (256*1024UL)
 
 
 class fpga_mmio {
     private :
         void *virt_page_base;
         int fp_dev_mem;
+        uint32_t PAGE_SIZE;
 
     public :
 
         fpga_mmio (void) {}
         
-        template <class addr_type, class data_type>
-        int fpga_poke (addr_type register_offset, data_type val) {
-            addr_type *tmp_addr;
-            tmp_addr = (addr_type *)((uint8_t *)virt_page_base + register_offset);
+        template <class access_type>
+        int fpga_poke (uint32_t register_offset, access_type val) {
+            access_type *tmp_addr;
+            tmp_addr = (access_type *)((uint8_t *)virt_page_base + register_offset);
 
             *tmp_addr = val;
-            //cout << "Addr = " << hex << tmp_addr << " : Val = " << val <<endl;
             return 0;
         }
 
-        template <class addr_type, class data_type>
-        data_type fpga_peek (addr_type register_offset) {
-            addr_type *tmp_addr;
-            tmp_addr = (addr_type *)((uint8_t *)virt_page_base + register_offset);
+        template <class access_type>
+        access_type fpga_peek (uint32_t register_offset) {
+            access_type *tmp_addr;
+            tmp_addr = (access_type *)((uint8_t *)virt_page_base + register_offset);
             return(*tmp_addr);
         }
 
 
-        int fpga_mmio_init(uint32_t base_address) {
-
+        template <class addr_type>
+        int fpga_mmio_init(addr_type base_address, uint32_t PAGE_SIZE_i) {
+            PAGE_SIZE = PAGE_SIZE_i;
 
             if((fp_dev_mem = open("/dev/mem", O_RDWR | O_SYNC)) == -1) FAUT_CONDITION;
             fflush(stdout);
