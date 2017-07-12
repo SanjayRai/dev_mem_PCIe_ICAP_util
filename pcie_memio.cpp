@@ -109,6 +109,7 @@ int main(int argc, char **argv) {
     cout << "Transfer Count = "<< xfer_count*4 << " Bytes | Bandwidth =  " << (xfer_count*4)/high_res_elapsed_time << "Bytes/s\n";
     printf ("Elapsede time = %f secs\n", (double)elspsed_time/CLOCKS_PER_SEC);
 
+    delete [] bitStream_buffer;
     delete [] data_buf_ptr;
     return 0;
 }
